@@ -1,5 +1,5 @@
 import { getAllPostSlugs, getPostBySlug } from '@/app/lib/mdx'
-import { components } from '@/app/ui/components'
+import { components } from '@/src/app/ui/components'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 
 export async function generateStaticParams() {
