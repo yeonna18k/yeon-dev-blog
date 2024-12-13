@@ -1,11 +1,5 @@
-import { getAllPostSlugs, getPostBySlug } from '@/app/lib/mdx'
-import { components } from '@/src/app/ui/components'
+import { getPostBySlug } from '@/src/lib/mdx'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-
-export async function generateStaticParams() {
-  const posts = getAllPostSlugs()
-  return posts
-}
 
 export default async function Post({ params }: { params: { slug: string } }) {
   const { content, metadata } = await getPostBySlug(params.slug)
@@ -13,7 +7,10 @@ export default async function Post({ params }: { params: { slug: string } }) {
   return (
     <main className="prose mx-auto">
       <h1>{metadata.title}</h1>
-      <MDXRemote source={content} components={components()} />
+      <MDXRemote
+        source={content}
+        // components={components()}
+      />
     </main>
   )
 }

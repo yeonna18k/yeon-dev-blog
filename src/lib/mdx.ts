@@ -6,13 +6,8 @@ const postsDirectory = path.join(process.cwd(), '_posts')
 
 export function getAllPostSlugs() {
   const fileNames = fs.readdirSync(postsDirectory)
-  return fileNames.map((fileName) => {
-    return {
-      params: {
-        slug: fileName.replace(/\.mdx$/, ''),
-      },
-    }
-  })
+  const slugs = fileNames.map((fileName) => fileName.replace(/\.mdx$/, ''))
+  return slugs
 }
 
 export async function getPostBySlug(slug: string) {
@@ -26,4 +21,10 @@ export async function getPostBySlug(slug: string) {
     metadata: data,
     content,
   }
+}
+
+export async function getPostsList() {
+  const slugs = getAllPostSlugs()
+  const postsList = await Promise.all(slugs.map((slug) => getPostBySlug(slug)))
+  return postsList
 }
