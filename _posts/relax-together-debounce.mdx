@@ -1,0 +1,261 @@
+---
+title: '[프로젝트] [Relax-Together] Debounce를 이용하여 과도한 API 요청 제한하기(feat. Throttle)'
+description: '미리보기 미리보기 미리보기'
+date: '2024/11/15'
+category: 'React'
+---
+
+# 배경
+
+회원가입 할 때 이미 가입한 이메일인지 검증하는 인풋이 있었다.
+따로 버튼을 누르면 동작하는 방식이 아니라, 입력 즉시 검증 결과를 보여줘야 했기 때문에 인풋에 입력이 들어올 때마다 API 요청을 하게 되었다.
+그러다보니 사용자가 입력중임에도 불필요한 API 요청이 일어났고, 이것을 개선하기 위해 debouce를 사용하여 중복되는 이벤트를 제어하기로 하였다.
+
+# Debounce와 Throttle
+
+## Debounce
+
+### 개념
+
+![](/images/posts/relax-together-debounce/01.png)
+함수를 마지막으로 호출한 후 일정 시간이 경과한 후에 함수가 실행되도록 하는 방법이다.
+사용 : 검색 기능, 실시간 유효성 검사 등
+
+#### Leading Debounce, Trailing Debounce
+
+**Leading Debounce**
+![](/images/posts/relax-together-debounce/02.png)
+처음 이벤트가 발생하면 함수를 실행하면서 동시에 2000ms의 타이머를 작동시킨다.
+2000ms내에 이벤트가 발생하면, 해당 이벤트는 무시되고 타이머는 초기화되며 2000ms를 다시 센다.
+
+**Trailing Debounce**
+![](/images/posts/relax-together-debounce/03.png)
+이벤트 발생 후 2000ms내에 이벤트가 발생하면, 타이머를 초기화시키고 2000ms를 다시 센다.
+마지막 이벤트 발생 후 2000ms가 지나면 함수를 실행한다.
+
+### 예시
+
+```js
+import { useState, useEffect } from 'react'
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    // cleanup: 값이 변경될 때 이전 타이머를 제거
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+export default useDebounce
+```
+
+## Throttle
+
+### 개념
+
+일정 시간동안 하나의 함수만 실행되도록 하는 방법이다.
+사용 : 무한스크롤 등
+
+#### Leading Throttle, Trailing Throttle
+
+**Leading Throttle**
+![](/images/posts/relax-together-debounce/04.png)
+이벤트가 발생하고 2000ms내에 이벤트가 발생하였을 때 무시된다.
+Debounce와 다른 점은 2000ms내에 이벤트가 발생하더라도 타이머는 초기화되지 않는다.
+위 그림처럼 일정한 간격을 두고 이벤트가 하나씩만 실행된다고 이해하면 된다.
+
+**Trailing Throttle**
+![](/images/posts/relax-together-debounce/05.png)
+
+이벤트가 발생하고 2000ms 내에 발생한 이벤트 중 마지막으로 발생한 이벤트만 리스닝하여 함수를 실행한다.
+그림을 보면 첫 번째 이벤트 발생 후 2000ms내에 두 번째 이벤트가 발생하였는데, 두 번째 이벤트만 실행되는 것을 볼 수 있다.
+
+### 예시
+
+```js
+import { useState, useEffect, useRef } from 'react'
+
+function useThrottle(value, limit) {
+  const [throttledValue, setThrottledValue] = useState(value)
+  const lastRan = useRef(Date.now())
+
+  useEffect(() => {
+    const handler = setTimeout(
+      () => {
+        if (Date.now() - lastRan.current >= limit) {
+          setThrottledValue(value)
+          lastRan.current = Date.now()
+        }
+      },
+      limit - (Date.now() - lastRan.current),
+    )
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, limit])
+
+  return throttledValue
+}
+
+export default useThrottle
+```
+
+# 적용
+
+usehooks-ts 라이브러리를 사용하여 Debounce를 구현하였다.
+[React Hook - useDebounceValue](https://usehooks-ts.com/react-hook/use-debounce-value)
+
+## Docs 사용 예시
+
+```ts
+import { useDebounceValue } from 'usehooks-ts'
+
+export default function Component({ defaultValue = 'John' }) {
+  const [debouncedValue, setValue] = useDebounceValue(defaultValue, 500)
+
+  return (
+    <div>
+      <p>Debounced value: {debouncedValue}</p>
+
+      <input
+        type="text"
+        defaultValue={defaultValue}
+        onChange={event => setValue(event.target.value)}
+      />
+    </div>
+  )
+```
+
+useState처럼 간편하게 Debouce를 사용할 수 있다.
+
+### 파라미터
+
+- initialValue : 디바운스할 값
+- delay : 값이 업데이트되기까지 지연 시간(밀리초, 기본값 500ms)
+- options
+
+## 프로젝트
+
+useDebounceValue를 사용하여 값을 정의해준다.
+
+```ts
+const [debouncedValue, setValue] = useDebounceValue(
+  form.getValues('email'),
+  500,
+)
+```
+
+이메일 중복확인 API를 요청하는 함수를 만들었다.
+
+```ts
+const handleVerifyUniqueEmail = async () => {
+  try {
+    const response = await signupApiService.VerifyUniqueEmail(debouncedValue)
+    return response.data
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status === 409) {
+        form.setError('email', {
+          message: '중복된 이메일입니다.',
+        })
+      } else {
+        form.setError('email', {
+          message: '이메일 확인 중 오류가 발생했습니다.',
+        })
+      }
+    }
+  }
+}
+```
+
+훅을 호출하면 호출과 동시에 실행될 수 있도록 useEffect를 사용하였다.
+
+```ts
+useEffect(() => {
+  if (debouncedValue.length > 0 && error.email === undefined) {
+    handleVerifyUniqueEmail()
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [debouncedValue])
+
+useEffect(() => {
+  form.watch((value) => {
+    if (value.email) {
+      setValue(value.email)
+    }
+  })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [setValue])
+```
+
+완성된 이메일 중복검사 훅은 아래와 같다.
+
+```ts
+import axios from 'axios'
+import { useEffect } from 'react'
+import { FieldErrors, UseFormReturn } from 'react-hook-form'
+import { useDebounceValue } from 'usehooks-ts'
+import { SignupFormType } from '../../../../features/auth/signup/ui/SignupForm'
+import { signupApiService } from '../../api/service/AuthApiService'
+
+export async function useVerifyUniqueEmail(
+  form: UseFormReturn<SignupFormType>,
+  error: FieldErrors,
+) {
+  const [debouncedValue, setValue] = useDebounceValue(
+    form.getValues('email'),
+    500,
+  )
+
+  const handleVerifyUniqueEmail = async () => {
+    try {
+      const response = await signupApiService.VerifyUniqueEmail(debouncedValue)
+      return response.data
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 409) {
+          form.setError('email', {
+            message: '중복된 이메일입니다.',
+          })
+        } else {
+          form.setError('email', {
+            message: '이메일 확인 중 오류가 발생했습니다.',
+          })
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (debouncedValue.length > 0 && error.email === undefined) {
+      handleVerifyUniqueEmail()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue])
+
+  useEffect(() => {
+    form.watch((value) => {
+      if (value.email) {
+        setValue(value.email)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setValue])
+}
+```
+
+간편하게 Debounce를 구현할 수 있었다.
+
+# 후기
+
+React-Hook-Form을 사용하며 form의 value를 직접 가져다가 관찰했는데, React-Hook-Form에서 제공하는 watch를 사용하면 더 깔끔하게 구성할 수 있지 않을까 생각하였다.
