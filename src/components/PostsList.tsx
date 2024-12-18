@@ -14,16 +14,16 @@ export default async function PostsList() {
             className="block p-4 border rounded-lg shadow-md hover:shadow-lg transition-shadow"
           >
             <div className="flex">
-              <Image
-                src={
-                  post?.slug
-                    ? `/images/posts/${post.slug}/thumbnail.png`
-                    : `/images/base-img.png`
-                }
-                alt={post.slug || `base-img`}
-                width={300}
-                height={160}
-              />
+              {post.hasThumbnail ? (
+                <Image
+                  src={`/images/posts/${post.slug}/thumbnail.png`}
+                  alt={post.slug || `base-img`}
+                  width={200}
+                  height={150}
+                />
+              ) : (
+                <></>
+              )}
               <div>
                 <div>{post.metadata.title}</div>
                 <div>{post.metadata.date}</div>
