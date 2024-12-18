@@ -16,10 +16,21 @@ export async function getPostBySlug(slug: string) {
 
   const { data, content } = matter(fileContents)
 
+  const filePath = path.join(
+    process.cwd(),
+    'public',
+    'images',
+    'posts',
+    slug,
+    'thumbnail.png',
+  )
+  const fileExists = fs.existsSync(filePath)
+
   return {
     slug,
     metadata: data,
     content,
+    hasThumbnail: fileExists,
   }
 }
 
