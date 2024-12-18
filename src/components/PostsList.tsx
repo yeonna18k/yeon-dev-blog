@@ -1,9 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getPostsList } from '../lib/mdx'
+import { PostsListProps } from '../app/page'
 
-export default async function PostsList() {
-  const postsList = await getPostsList()
+export default async function PostsList({
+  postsList,
+}: {
+  postsList: PostsListProps[]
+}) {
   return (
     <div>
       {postsList.map((post) => {
