@@ -15,7 +15,7 @@ export interface PostsListProps {
 ;[]
 
 export default async function Home(props: {
-  searchParams: Record<string, string | string[]>
+  searchParams: Promise<Record<string, string | string[]>>
 }) {
   const searchParams = await props.searchParams
   const postsList = await getPostsList()
