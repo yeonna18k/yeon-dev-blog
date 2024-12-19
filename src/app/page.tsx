@@ -1,9 +1,8 @@
-import { SearchParams } from 'next/dist/server/request/search-params'
 import Category from '../components/Category'
 import PostsList from '../components/PostsList'
 import Sort from '../components/Sort'
 import { getPostsList } from '../lib/mdx'
-import { getFilteredPostsList } from './api/route'
+import { getFilteredPostsList } from '../utils/filterPosts'
 
 export interface PostsListProps {
   slug: string
@@ -15,7 +14,9 @@ export interface PostsListProps {
 }
 ;[]
 
-export default async function Home(props: { searchParams: SearchParams }) {
+export default async function Home(props: {
+  searchParams: Record<string, string | string[]>
+}) {
   const searchParams = await props.searchParams
   const postsList = await getPostsList()
 
