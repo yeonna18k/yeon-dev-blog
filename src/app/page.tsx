@@ -1,7 +1,7 @@
-import { Params } from 'next/dist/server/request/params'
 import { SearchParams } from 'next/dist/server/request/search-params'
-import FilteringPostsList from '../components/FilterDropdown'
+import Category from '../components/Category'
 import PostsList from '../components/PostsList'
+import Sort from '../components/Sort'
 import { getPostsList } from '../lib/mdx'
 import { getFilteredPostsList } from './api/route'
 
@@ -15,26 +15,24 @@ export interface PostsListProps {
 }
 ;[]
 
-export default async function Home(props: {
-  params: Params
-  searchParams: SearchParams
-}) {
+export default async function Home(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams
   const postsList = await getPostsList()
 
-  const filter = searchParams.filter || null
-  const sort = searchParams.sort || 'latest'
+  const category = searchParams.category || ''
+  const sortBy = searchParams.sortBy || 'latest'
 
   const filteredPostsList = await getFilteredPostsList({
-    filter,
-    sort,
+    category,
+    sortBy,
     postsList,
   })
 
   return (
     <section className=" bg-slate-200 w-full lg:max-w-[900px] lg:mx-auto">
       <h1 className="text-4xl">글 목록</h1>
-      <FilteringPostsList />
+      <Category />
+      <Sort />
       <PostsList postsList={filteredPostsList} />
     </section>
   )

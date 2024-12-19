@@ -1,8 +1,8 @@
 import { PostsListProps } from '../page'
 
 interface FilteredListProps {
-  filter: string | string[] | null
-  sort: string | string[] | null
+  category: string | string[] | null
+  sortBy: string | string[] | null
   postsList: PostsListProps[]
 }
 
@@ -16,31 +16,29 @@ export async function GET(request: Request) {
 }
 
 export async function getFilteredPostsList({
-  filter,
-  sort,
+  category,
+  sortBy,
   postsList,
 }: FilteredListProps) {
-  const filtered = filter
-    ? postsList.filter((post) => post.metadata.category === filter)
+  let filtered = category
+    ? postsList.filter((post) => post.metadata.category === category)
     : postsList
 
-  const sorted = (() => {
-    if (sort === 'latest') {
-      return filtered.sort(
-        (a, b) =>
-          new Date(b.metadata.date).getTime() -
-          new Date(a.metadata.date).getTime(),
-      )
-    } else if (sort === 'oldest') {
-      return filtered.sort(
-        (a, b) =>
-          new Date(a.metadata.date).getTime() -
-          new Date(b.metadata.date).getTime(),
-      )
-    } else {
-      return filtered
-    }
-  })()
+  if (sortBy === 'latest') {
+    filtered.sort(
+      (a, b) =>
+        new Date(b.metadata.date).getTime() -
+        new Date(a.metadata.date).getTime(),
+    )
+  } else if (sortBy === 'oldest') {
+    filtered.sort(
+      (a, b) =>
+        new Date(a.metadata.date).getTime() -
+        new Date(b.metadata.date).getTime(),
+    )
+  } else {
+    filtered
+  }
 
-  return sorted
+  return filtered
 }
