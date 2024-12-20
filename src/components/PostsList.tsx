@@ -14,9 +14,14 @@ export default async function PostsList({
           <Link
             href={`/posts/${post.slug}`}
             key={post.slug}
-            className="block p-4 border rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            className="block h-[200px] py-6 border-b border-b-gray-200"
           >
-            <div className="flex">
+            <div className="flex justify-between">
+              <div className="">
+                <h2>{post.metadata.title}</h2>
+                <div>{post.metadata.date}</div>
+                <div>{post.metadata.description}</div>
+              </div>
               {post.hasThumbnail ? (
                 <Image
                   src={`/images/posts/${post.slug}/thumbnail.png`}
@@ -27,11 +32,6 @@ export default async function PostsList({
               ) : (
                 <></>
               )}
-              <div>
-                <div>{post.metadata.title}</div>
-                <div>{post.metadata.date}</div>
-                <div>{post.metadata.description}</div>
-              </div>
             </div>
           </Link>
         )
