@@ -1,4 +1,3 @@
-import Category from '../components/Category'
 import PostsList from '../components/PostsList'
 import Sort from '../components/Sort'
 import { getPostsList } from '../lib/mdx'
@@ -30,9 +29,8 @@ export default async function Home(props: {
   })
 
   return (
-    <section className=" bg-slate-200 w-full lg:max-w-[900px] lg:mx-auto">
-      <h1 className="text-4xl">글 목록</h1>
-      <Category />
+    <section className=" w-full lg:max-w-[768px] lg:mx-auto">
+      <h1 className="text-4xl">글 전체</h1>
       <Sort />
       <PostsList postsList={filteredPostsList} />
     </section>
