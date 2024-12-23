@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import PostsList from '../components/PostsList'
 import Sort from '../components/Sort'
 import { categoryMap } from '../lib/categoryOptions'
@@ -33,12 +34,14 @@ export default async function Home(props: {
   })
 
   return (
-    <section className=" w-full lg:w-[768px] lg:mx-auto">
-      <h1 className="text-4xl">
-        {category === '' ? '전체 글' : categories[category as Category]}
-      </h1>
-      <Sort />
-      <PostsList postsList={filteredPostsList} />
-    </section>
+    <Suspense fallback={<div>Loading ■■■■■□98% </div>}>
+      <section className=" w-full lg:w-[768px] lg:mx-auto">
+        <h1 className="text-4xl">
+          {category === '' ? '전체 글' : categories[category as Category]}
+        </h1>
+        <Sort />
+        <PostsList postsList={filteredPostsList} />
+      </section>
+    </Suspense>
   )
 }
