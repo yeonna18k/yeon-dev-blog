@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Category from './Category'
 
-export default function Header() {
+export default async function Header() {
   return (
     <div className="h-16 content-center">
       <div className="max-w-screen-lg flex justify-between mx-auto">
