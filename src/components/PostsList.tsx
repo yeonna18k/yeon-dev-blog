@@ -30,7 +30,7 @@ export default async function PostsList({
                   height={150}
                 />
               ) : (
-                <></>
+                <>{}</>
               )}
             </div>
           </Link>

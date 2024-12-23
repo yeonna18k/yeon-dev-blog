@@ -1,11 +1,33 @@
-export const categoryOptions = [
-  { value: '', label: '모두' },
-  { value: 'react', label: '리액트' },
-  { value: 'nextjs', label: '넥스트' },
-  { value: 'sample', label: '샘플' },
-  { value: 'package-manager', label: '패키지 매니저' },
-]
+import { getPostsList } from './mdx'
 
-export const categoryMap = Object.fromEntries(
-  categoryOptions.map(({ value, label }) => [value, label]),
-)
+export async function generateCategoryOptions() {
+  const postsList = await getPostsList()
+
+  const categoriesSet = new Set<string>()
+
+  categoriesSet.add(JSON.stringify({ value: '', label: '모두' }))
+
+  postsList.forEach((post) => {
+    if (post.metadata.category) {
+      const categoryObj = {
+        value: post.metadata.category,
+        label: post.metadata.label,
+      }
+      categoriesSet.add(JSON.stringify(categoryObj))
+    }
+  })
+
+  const categoryOptions = Array.from(categoriesSet).map((item) =>
+    JSON.parse(item),
+  )
+  return categoryOptions
+}
+
+export async function categoryMap() {
+  const categoryOptions = await generateCategoryOptions()
+
+  const categoryMap = Object.fromEntries(
+    categoryOptions.map(({ value, label }) => [value, label]),
+  )
+  return categoryMap
+}

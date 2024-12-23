@@ -1,3 +1,4 @@
+import { PageProps } from '@/.next/types/app/page'
 import PostsList from '../components/PostsList'
 import Sort from '../components/Sort'
 import { categoryMap } from '../lib/categoryOptions'
@@ -16,14 +17,13 @@ export interface PostsListProps {
 
 type Category = keyof typeof categoryMap
 
-export default async function Home(props: {
-  searchParams: Promise<Record<string, string | string[]>>
-}) {
-  const searchParams = await props.searchParams
+export default async function Home({ searchParams }: PageProps) {
+  const searchParamsResolved = await searchParams
   const postsList = await getPostsList()
+  const categories = await categoryMap()
 
-  const category = searchParams.category || ''
-  const sortBy = searchParams.sortBy || 'latest'
+  const category = searchParamsResolved.category || ''
+  const sortBy = searchParamsResolved.sortBy || 'latest'
 
   const filteredPostsList = await getFilteredPostsList({
     category,
@@ -34,7 +34,7 @@ export default async function Home(props: {
   return (
     <section className=" w-full lg:w-[768px] lg:mx-auto">
       <h1 className="text-4xl">
-        {category === '' ? '글 전체' : categoryMap[category as Category]}
+        {category === '' ? '전체 글' : categories[category as Category]}
       </h1>
       <Sort />
       <PostsList postsList={filteredPostsList} />

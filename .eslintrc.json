@@ -1,9 +1,12 @@
 {
+  "parser": "@typescript-eslint/parser",
   "extends": [
-    "next/core-web-vitals",
-    "next/typescript",
-    "@titicaca/eslint-config-triple",
-    "@titicaca/eslint-config-triple/requiring-type-checking",
     "@titicaca/eslint-config-triple/frontend",
-    "@titicaca/eslint-config-triple/prettier"]
+    "@titicaca/eslint-config-triple/prettier"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json", // tsconfig.json 경로
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  }
 }
