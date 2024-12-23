@@ -30,6 +30,7 @@ export default function DropdownFilter({
   useEffect(() => {
     handleFilterChange('category')('')
     handleFilterChange('sortBy')('latest')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {

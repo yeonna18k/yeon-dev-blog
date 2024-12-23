@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+
 import PostsList from '../components/PostsList'
 import Sort from '../components/Sort'
 import { categoryMap } from '../lib/categoryOptions'
