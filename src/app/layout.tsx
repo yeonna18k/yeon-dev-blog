@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { Suspense } from 'react'
 import Header from '../components/Header'
 import './globals.css'
 
@@ -18,11 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="">
-        <Header />
-        <main className="">{children}</main>
-        {/* <Footer /> */}
-      </body>
+      <Suspense fallback={<div>Loading...</div>}>
+        <body className="">
+          <Header />
+          <main className="">{children}</main>
+          {/* <Footer /> */}
+        </body>
+      </Suspense>
     </html>
   )
 }
