@@ -19,13 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Suspense fallback={<div>Loading...</div>}>
-        <body className="">
+      <body className="">
+        <Suspense fallback={<div>Loading...</div>}>
           <Header />
           <main className="">{children}</main>
           {/* <Footer /> */}
-        </body>
-      </Suspense>
+        </Suspense>
+      </body>
     </html>
   )
 }
